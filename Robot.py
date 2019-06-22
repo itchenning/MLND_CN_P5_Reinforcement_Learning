@@ -41,10 +41,12 @@ class Robot(object):
         update these parameters when necessary.
         """
         if self.testing:
-            # TODO 1. No random choice when testing
+            # DOEN 1. No random choice when testing
+            self.epsilon = 0
             pass
         else:
-            # TODO 2. Update parameters when learning
+            # DONE 2. Update parameters when learning
+            self.epsilon = 0.85
             pass
 
         return self.epsilon
@@ -54,18 +56,21 @@ class Robot(object):
         Get the current state of the robot. In this
         """
 
-        # TODO 3. Return robot's current state
-        return None
+        # DONE 3. Return robot's current state
+        return self.maze.sense_robot()
 
     def create_Qtable_line(self, state):
         """
         Create the qtable with the current state
         """
-        # TODO 4. Create qtable with current state
+        # DONE 4. Create qtable with current state
         # Our qtable should be a two level dict,
         # Qtable[state] ={'u':xx, 'd':xx, ...}
         # If Qtable[state] already exits, then do
         # not change it.
+        if state in self.Qtable:
+            return
+        self.Qtable[state] = {a : 0 for a in self.maze.valid_actions}
         pass
 
     def choose_action(self):
@@ -74,31 +79,47 @@ class Robot(object):
         """
         def is_random_exploration():
 
-            # TODO 5. Return whether do random choice
+            # DONE 5. Return whether do random choice
             # hint: generate a random number, and compare
             # it with epsilon
-            pass
+            return random.random()<= self.epsilon
 
         if self.learning:
             if is_random_exploration():
-                # TODO 6. Return random choose aciton
-                return None
+                # DONE 6. Return random choose aciton
+                return self.maze.valid_actions[random.randint(0,len(self.maze.valid_actions)-1)]
             else:
-                # TODO 7. Return action with highest q value
-                return None
+                # DONE 7. Return action with highest q value
+                max = -100
+                max_key = None
+                for key, value in self.Qtable[self.state].items():
+                    if value > max:
+                        max_key = key
+                        max = value
+                return max_key
         elif self.testing:
-            # TODO 7. choose action with highest q value
+            # DONE 7. choose action with highest q value
+            max = -100
+            max_key = None
+            for key, value in self.Qtable[self.state].items():
+                if value > max:
+                    max_key = key
+                    max = value
+            return max_key
         else:
-            # TODO 6. Return random choose aciton
+            # DONE 6. Return random choose aciton
+            return self.maze.valid_actions[random.randint(0,len(self.maze.valid_actions)-1)]
 
     def update_Qtable(self, r, action, next_state):
         """
         Update the qtable according to the given rule.
         """
         if self.learning:
-            pass
-            # TODO 8. When learning, update the q table according
+            # DONE 8. When learning, update the q table according
             # to the given rules
+            values = self.Qtable[self.state]
+            next_values = self.Qtable[next_state]
+            values[action] = (1 - self.alpha) * values[action] + self.alpha * (r + self.gamma * max(next_values.values()))
 
     def update(self):
         """
