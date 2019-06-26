@@ -1,4 +1,5 @@
 import random
+import operator
 
 class Robot(object):
 
@@ -46,7 +47,9 @@ class Robot(object):
             pass
         else:
             # DONE 2. Update parameters when learning
-            self.epsilon = 0.85
+            a = 0.05
+            self.epsilon -= self.epsilon0 * self.t * a
+            self.t += 1
             pass
 
         return self.epsilon
@@ -68,9 +71,7 @@ class Robot(object):
         # Qtable[state] ={'u':xx, 'd':xx, ...}
         # If Qtable[state] already exits, then do
         # not change it.
-        if state in self.Qtable:
-            return
-        self.Qtable[state] = {a : 0 for a in self.maze.valid_actions}
+        self.Qtable.setdefault(state, {a : 0.0 for a in self.valid_actions})
         pass
 
     def choose_action(self):
@@ -90,22 +91,10 @@ class Robot(object):
                 return self.maze.valid_actions[random.randint(0,len(self.maze.valid_actions)-1)]
             else:
                 # DONE 7. Return action with highest q value
-                max = -100
-                max_key = None
-                for key, value in self.Qtable[self.state].items():
-                    if value > max:
-                        max_key = key
-                        max = value
-                return max_key
+                return max(self.Qtable[self.state], key=self.Qtable[self.state].get)
         elif self.testing:
             # DONE 7. choose action with highest q value
-            max = -100
-            max_key = None
-            for key, value in self.Qtable[self.state].items():
-                if value > max:
-                    max_key = key
-                    max = value
-            return max_key
+            return max(self.Qtable[self.state], key=self.Qtable[self.state].get)
         else:
             # DONE 6. Return random choose aciton
             return self.maze.valid_actions[random.randint(0,len(self.maze.valid_actions)-1)]
