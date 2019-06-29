@@ -1,5 +1,6 @@
 import random
 import operator
+import math
 
 class Robot(object):
 
@@ -48,8 +49,11 @@ class Robot(object):
         else:
             # DONE 2. Update parameters when learning
             a = 0.05
-            self.epsilon -= self.epsilon0 * self.t * a
             self.t += 1
+            if self.epsilon <= 0:
+                self.epsilon = 0
+            else:
+                self.epsilon = 0.5*math.cos(a * self.t)
             pass
 
         return self.epsilon
